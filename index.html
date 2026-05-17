@@ -48,6 +48,19 @@ h2{color:gold;font-family:'Pirata One',cursive;margin:12px 0 6px;}
 .option-box label{color:#ffcc66;font-size:0.93em;cursor:pointer;}
 .option-box input[type=checkbox]{width:20px;height:20px;cursor:pointer;accent-color:gold;}
 .option-box select{background:#1a0e06;color:gold;border:1px solid #6b3a1a;border-radius:6px;padding:4px 8px;font-size:0.93em;}
+.forban-box{max-width:540px;margin:12px auto;border:1px solid #8b4513;border-radius:12px;background:rgba(0,0,0,0.50);overflow:hidden;}
+.forban-header{padding:12px 16px;cursor:pointer;font-family:'Pirata One',cursive;font-size:1.05em;color:#e8c060;display:flex;justify-content:space-between;align-items:center;user-select:none;background:rgba(80,30,0,0.30);}
+.forban-header:hover{background:rgba(80,30,0,0.50);}
+.forban-arrow{transition:transform 0.3s;font-size:0.8em;}
+.forban-arrow.open{transform:rotate(180deg);}
+.forban-body{padding:0 14px;max-height:0;overflow:hidden;transition:max-height 0.4s ease,padding 0.3s;}
+.forban-body.open{max-height:600px;padding:12px 14px;}
+.forban-rule{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid rgba(139,69,19,0.30);}
+.forban-rule:last-child{border-bottom:none;}
+.forban-rule input[type=checkbox]{width:22px;height:22px;flex-shrink:0;margin-top:3px;accent-color:gold;cursor:pointer;}
+.forban-rule-text{flex:1;}
+.forban-rule-text label{color:#ffcc66;font-size:0.95em;cursor:pointer;display:block;margin-bottom:3px;}
+.forban-rule-text p{color:#c8a870;font-size:0.80em;margin:0;line-height:1.5;}
 .btn{padding:10px 18px;margin:4px;border:none;border-radius:8px;background:linear-gradient(145deg,#8b0000,#b22222);color:#fff;font-weight:bold;cursor:pointer;font-size:0.95em;box-shadow:0 2px 8px rgba(0,0,0,0.5);}
 .btn:hover{background:#cc3333;}.btn-gold{background:linear-gradient(145deg,#7a5a00,#c8960a);}.btn-gold:hover{background:#daa520;}
 .btn-sm{padding:6px 12px;font-size:0.85em;}.btn-blue{background:linear-gradient(145deg,#005080,#0077aa);}.btn-blue:hover{background:#0099cc;}
@@ -58,7 +71,6 @@ h2{color:gold;font-family:'Pirata One',cursive;margin:12px 0 6px;}
 @keyframes bannerPulse{0%,100%{box-shadow:0 0 18px #2244aa;}50%{box-shadow:0 0 32px #4466ff;}}
 #stormBanner p{margin:0;font-family:'Pirata One',cursive;font-size:clamp(13px,3.5vw,18px);color:#aaccff;text-shadow:0 0 8px #4488ff;line-height:1.5;}
 /* Weather auto banner */
-#weatherBanner{display:none;background:rgba(0,80,0,0.3);border:1px solid #0f0;border-radius:8px;padding:6px 12px;max-width:400px;margin:4px auto;font-size:0.8em;color:#aaffaa;}
 /* Carousel */
 #carouselWrap{position:relative;overflow:hidden;width:100%;touch-action:pan-y;}
 #carouselTrack{display:flex;transition:transform 0.35s cubic-bezier(.4,0,.2,1);will-change:transform;}
@@ -176,7 +188,6 @@ th{background:#1e0b05;color:gold;}
 <div class="round-transition" id="roundTransition"><div class="round-transition-text" id="roundTransitionText"></div></div>
 <h1>🏴‍☠️ Compteur Skull King</h1>
 <h3 id="subtitle">+ bonus extension : Tempêtes et Canailles</h3>
-<div id="weatherBanner">🌦️ Météo détectée — mode tempête activé automatiquement !</div>
 <div id="stormBanner"><p>⛈️⚡🌊 Yo-Ho, la météo tourne, moussaillons !<br>Sortez la carte <em>Tempêtes</em> — ça va brasser !</p></div>
 
 <!-- SETUP -->
@@ -193,7 +204,6 @@ th{background:#1e0b05;color:gold;}
     <button class="btn" id="btnAdd">Ajouter</button>
   </div>
   <div id="playerList"></div>
-  <div class="option-box"><input type="checkbox" id="chkExt" checked><label for="chkExt">Extension <strong>Tempêtes et Canailles</strong></label></div>
   <div class="option-box">
     <label for="selRounds" style="color:#ffcc66;">Manches :</label>
     <select id="selRounds">
@@ -207,6 +217,32 @@ th{background:#1e0b05;color:gold;}
   <div class="option-box"><input type="checkbox" id="chkTourn"><label for="chkTourn">🏆 Mode tournoi</label></div>
   <div class="option-box"><input type="checkbox" id="chkTeams"><label for="chkTeams">⚓ Mode équipes</label>
     <select id="selTeams"><option value="2">2 équipes</option><option value="3">3 équipes</option><option value="4">4 équipes</option></select>
+  </div>
+  <div class="forban-box">
+    <div class="forban-header" id="forbanToggle">&#9760;&#65039; R&egrave;gles de Forban &amp; Options <span class="forban-arrow" id="forbanArrow">&#9660;</span></div>
+    <div class="forban-body" id="forbanBody">
+      <div class="forban-rule">
+        <input type="checkbox" id="chkExt" checked>
+        <div class="forban-rule-text">
+          <label for="chkExt"><strong>Extension Temp&ecirc;tes et Canailles</strong></label>
+          <p>Active les bonus d'extension et la cin&eacute;matique orageuse &agrave; partir de la manche 6.</p>
+        </div>
+      </div>
+      <div class="forban-rule">
+        <input type="checkbox" id="chkPardon">
+        <div class="forban-rule-text">
+          <label for="chkPardon"><strong>Pardon de Sedna</strong></label>
+          <p>Si un joueur parie plus de 1 pli et &eacute;choue, les bonus de cartes (Pirates, Skull King, Sir&egrave;nes, Carte 14) sont quand m&ecirc;me comptabilis&eacute;s.</p>
+        </div>
+      </div>
+      <div class="forban-rule">
+        <input type="checkbox" id="chkTousGagnants">
+        <div class="forban-rule-text">
+          <label for="chkTousGagnants"><strong>Tous Gagnants ? Tous Perdants !</strong></label>
+          <p>Si plusieurs joueurs obtiennent le score le plus &eacute;lev&eacute; sur une m&ecirc;me manche, ils re&ccedil;oivent tous 0 point pour cette manche.</p>
+        </div>
+      </div>
+    </div>
   </div>
   <button class="btn btn-gold" id="btnStart">⚓ Démarrer la partie</button>
   <button class="btn btn-sm" id="btnShowHistory">📜 Historique</button>
@@ -340,6 +376,7 @@ function playFanfare(){
 var players=[],playerOrder=[],gameHistory=[],round=1,withExt=true,maxRounds=10;
 var withTourn=false,tournData={};
 var withTeams=false,numTeams=2,teamAssign={};
+var withPardon=false,withTousGagnants=false;
 var currentCard=0,sdCard=0,editCard=0,editingRound=-1;
 var sdRound=0;
 
@@ -354,32 +391,10 @@ var sdRound=0;
   var t=JSON.parse(localStorage.getItem('skullkingTourn')||'null');
   if(t)tournData=t;
   refreshTournDisplay();
-  checkWeather();
 })();
 function saveNames(){localStorage.setItem('skullkingSave',JSON.stringify({players:players}));}
 function saveTourn(){localStorage.setItem('skullkingTourn',JSON.stringify(tournData));}
 
-/* ── Weather ── */
-function checkWeather(){
-  if(!navigator.geolocation)return;
-  navigator.geolocation.getCurrentPosition(function(pos){
-    var url='https://api.open-meteo.com/v1/forecast?latitude='+pos.coords.latitude+'&longitude='+pos.coords.longitude+'&current_weather=true';
-    fetch(url).then(function(r){return r.json();}).then(function(data){
-      var code=data.current_weather&&data.current_weather.weathercode;
-      /* codes 51+ = rain/storm */
-      if(code>=51){
-        document.getElementById('weatherBanner').style.display='block';
-        document.getElementById('chkExt').checked=true;
-        updateSubtitle();
-      }
-    }).catch(function(){});
-  },function(){});
-}
-
-/* ── Custom rounds toggle ── */
-function toggleCustomRounds(sel){
-  document.getElementById('customRounds').style.display=sel.value==='custom'?'inline-block':'none';
-}
 /* ── Subtitle ── */
 function updateSubtitle(){
   document.getElementById('subtitle').textContent=document.getElementById('chkExt').checked?'+ bonus extension : Tempêtes et Canailles':'Mode classique';
@@ -418,6 +433,8 @@ function startGame(){
     maxRounds=+selR.value;
   }
   withTourn=document.getElementById('chkTourn').checked;
+  withPardon=document.getElementById('chkPardon').checked;
+  withTousGagnants=document.getElementById('chkTousGagnants').checked;
   withTeams=document.getElementById('chkTeams').checked;
   numTeams=+document.getElementById('selTeams').value;
   playerOrder=players.map(function(_,i){return i;});
@@ -498,7 +515,13 @@ document.getElementById('btnBackFromTeams').onclick=function(){
 document.getElementById('btnConfirmTeams').onclick=function(){
   var unassigned=players.filter(function(_,pi){return teamAssign[pi]===undefined;});
   if(unassigned.length>0){
-    alert('Tous les joueurs doivent être assignés à une équipe ! (' + unassigned.map(function(p){return p.name;}).join(', ') + ')');
+    alert('Tous les joueurs doivent etre assignes a une equipe ! (' + unassigned.map(function(p){return p.name;}).join(', ') + ')');
+    return;
+  }
+  var teamsUsed={};
+  Object.keys(teamAssign).forEach(function(pi){teamsUsed[teamAssign[pi]]=true;});
+  if(Object.keys(teamsUsed).length<2){
+    alert('Il faut au moins 2 equipes differentes avec des joueurs !');
     return;
   }
   document.getElementById('teamSetupScreen').style.display='none';
@@ -622,7 +645,12 @@ function calcScore(i,pfx,rnd){
   var cards=pirates*30+mermaids*20+skull*40+fourteen;
   if(bet===0){return made===0?10*rnd+cards+extra:-10*rnd+extra;}
   else if(bet===made){return 20*bet+cards+extra;}
-  else{return -10*Math.abs(bet-made)+cards+extra;}
+  else{
+    var chkEl=document.getElementById('chkPardon');
+    var pardonOn=withPardon||(chkEl?chkEl.checked:false);
+    var cardsOnFailPreview=pardonOn?cards:0;
+    return -10*Math.abs(bet-made)+cardsOnFailPreview+extra;
+  }
 }
 function updatePreview(i,pfx,rnd){
   pfx=pfx||'';
@@ -645,9 +673,16 @@ function validateRound(){
     var cards=pirates*30+mermaids*20+skull*40+fourteen;
     var score=0;
     var success=false;
-    if(bet===0){if(made===0){score=10*round+cards+extra;success=true;}else{score=-10*round+extra;}}
-    else if(bet===made){score=20*bet+cards+extra;success=true;}
-    else{score=-10*Math.abs(bet-made)+cards+extra;}
+    if(bet===0){
+      if(made===0){score=10*round+cards+extra;success=true;}
+      else{score=-10*round+extra;}
+    } else if(bet===made){
+      score=20*bet+cards+extra;success=true;
+    } else {
+      /* Pardon de Sedna: si activé et pari >= 1, les cartes comptent quand même */
+      var cardsOnFail=withPardon?cards:0;
+      score=-10*Math.abs(bet-made)+cardsOnFail+extra;
+    }
     p.total+=score;
     p.skCount+=skull;
     p.betHistory.push({bet:bet,made:made,score:score,round:round});
@@ -656,6 +691,20 @@ function validateRound(){
     /* Flying card if perfect bet > 0 */
     if(success&&bet>0){flyCard(p.emoji);}
   });
+  if(withTousGagnants){
+    var roundGains=[];
+    playerOrder.forEach(function(pi,cardIdx){
+      roundGains.push({pi:pi,cardIdx:cardIdx,gain:players[pi].total-(snap[pi]?snap[pi].total:0)});
+    });
+    var maxGain=Math.max.apply(null,roundGains.map(function(x){return x.gain;}));
+    var tops=roundGains.filter(function(x){return x.gain===maxGain;});
+    if(tops.length>1){
+      tops.forEach(function(x){
+        players[x.pi].total=snap[x.pi].total;
+        details[x.cardIdx]=players[x.pi].emoji+' '+players[x.pi].name+': 0 (TG/TP)';
+      });
+    }
+  }
   gameHistory.push({round:round,details:details,players:snap,playerOrder:playerOrder.slice()});
   /* Round transition */
   var ov=document.getElementById('roundTransition');
@@ -982,6 +1031,10 @@ document.getElementById('btnToggleUndo').onclick=function(){var d=document.getEl
 
 document.getElementById('playerName').onkeydown=function(e){if(e.key==='Enter')addPlayer();};
 document.getElementById('selRounds').onchange=function(){toggleCustomRounds(this);};
+document.getElementById('forbanToggle').onclick=function(){
+  document.getElementById('forbanBody').classList.toggle('open');
+  document.getElementById('forbanArrow').classList.toggle('open');
+};
 
 document.getElementById('carouselTrack').addEventListener('click',function(e){
   var btn=e.target.closest('.sbtn');if(!btn)return;
@@ -996,5 +1049,11 @@ document.getElementById('editTrack').addEventListener('click',function(e){
   doStep(btn.dataset.id,+btn.dataset.delta,+btn.dataset.min,+btn.dataset.max);
 });
 </script>
+<div style="text-align:center;padding:20px 10px 30px;font-size:0.85em;">
+  <a href="#" id="rulesLink" style="color:#c8960a;text-decoration:none;border-bottom:1px dotted #c8960a;">
+    📜 Règles officielles du Skull King
+  </a>
+  <p style="color:#5a3010;font-size:0.78em;margin-top:4px;">(lien à venir)</p>
+</div>
 </body>
 </html>
