@@ -209,6 +209,35 @@ th{background:#1e0b05;color:gold;}
 .rules-example-val{font-family:monospace;color:#00ffcc;font-weight:bold;}
 .btn-rules{background:linear-gradient(145deg,#5a3010,#8b4513);color:#ffcc66;border:1px solid #8b4513;padding:6px 14px;border-radius:7px;cursor:pointer;font-size:0.85em;margin-left:8px;}
 .btn-rules:hover{background:#8b4513;}
+
+/* Trophées */
+.trophies-section{max-width:500px;margin:12px auto;background:rgba(0,0,0,0.5);border:1px solid #5a3010;border-radius:10px;padding:12px 16px;}
+.trophies-section h3{font-family:'Pirata One',cursive;color:#ffcc66;margin:0 0 10px;}
+.trophy-row{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid rgba(90,48,16,0.3);}
+.trophy-row:last-child{border-bottom:none;}
+.trophy-icon{font-size:1.5em;flex-shrink:0;}
+.trophy-name{font-weight:bold;color:gold;font-size:0.9em;}
+.trophy-desc{font-size:0.8em;color:#c8a870;}
+
+/* Progression chart */
+.chart-section{max-width:560px;margin:12px auto;background:rgba(0,0,0,0.5);border:1px solid #5a3010;border-radius:10px;padding:12px 16px;}
+.chart-section h3{font-family:'Pirata One',cursive;color:#ffcc66;margin:0 0 10px;}
+#progressChart{width:100%;height:220px;display:block;}
+
+/* Comparison section */
+.compare-section{max-width:500px;margin:12px auto;background:rgba(0,0,0,0.5);border:1px solid #5a3010;border-radius:10px;padding:12px 16px;}
+.compare-section h3{font-family:'Pirata One',cursive;color:#ffcc66;margin:0 0 10px;}
+.compare-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid rgba(90,48,16,0.25);font-size:0.88em;}
+.compare-row:last-child{border-bottom:none;}
+.compare-up{color:#00ffcc;font-weight:bold;}
+.compare-down{color:#ff5555;font-weight:bold;}
+.compare-same{color:#aaa;}
+
+/* Font size slider */
+.font-slider-box{display:flex;align-items:center;gap:10px;margin:10px auto;background:rgba(0,0,0,0.45);border:1px solid #6b3a1a;border-radius:8px;padding:10px 16px;max-width:420px;}
+.font-slider-box label{color:#ffcc66;font-size:0.93em;white-space:nowrap;}
+.font-slider-box input[type=range]{flex:1;accent-color:gold;}
+.font-slider-box span{color:gold;font-size:0.9em;min-width:30px;text-align:right;}
 </style>
 </head>
 <body>
@@ -242,6 +271,11 @@ th{background:#1e0b05;color:gold;}
     <input type="number" id="customRounds" min="1" max="20" value="10" placeholder="nb" style="display:none;width:60px;padding:4px 6px;border-radius:6px;border:none;background:#1a0e06;color:gold;text-align:center;font-size:0.95em;outline:2px solid #6b3a1a;">
   </div>
   <div class="option-box"><input type="checkbox" id="chkTourn"><label for="chkTourn">🏆 Mode tournoi</label></div>
+  <div class="font-slider-box">
+    <label>&#128269; Taille du texte :</label>
+    <input type="range" id="fontSlider" min="12" max="22" value="15" step="1">
+    <span id="fontSliderVal">15px</span>
+  </div>
   <div class="option-box"><input type="checkbox" id="chkTeams"><label for="chkTeams">⚓ Mode équipes</label>
     <select id="selTeams"><option value="2">2 équipes</option><option value="3">3 équipes</option><option value="4">4 équipes</option></select>
   </div>
@@ -333,6 +367,18 @@ th{background:#1e0b05;color:gold;}
   <div id="finalPodium"></div>
   <table style="margin:12px auto;max-width:420px;"><thead><tr><th>Pos.</th><th>Joueur</th><th>Score</th></tr></thead><tbody id="finalBody"></tbody></table>
   <div id="statsContainer"></div>
+<div class="trophies-section" id="trophiesSection" style="display:none;">
+  <h3>&#127942; Trophées de la partie</h3>
+  <div id="trophiesList"></div>
+</div>
+<div class="chart-section" id="chartSection" style="display:none;">
+  <h3>&#128200; Progression des scores</h3>
+  <canvas id="progressChart"></canvas>
+</div>
+<div class="compare-section" id="compareSection" style="display:none;">
+  <h3>&#128260; Comparaison avec la partie précédente</h3>
+  <div id="compareList"></div>
+</div>
   
   <button class="btn btn-gold" id="btnReplay">↺ Rejouer</button>
   <button class="btn" id="btnBackSetup">👥 Changer de joueurs</button>
@@ -392,7 +438,7 @@ th{background:#1e0b05;color:gold;}
         <tr><td><span class="rules-badge rb-amber">Pirates</span></td><td>+30 pts</td><td>Par pirate capturé</td></tr>
         <tr><td><span class="rules-badge rb-blue">Skull King</span></td><td>+40 pts</td><td>Par SK capturé</td></tr>
         <tr><td><span class="rules-badge rb-green">Sirènes</span></td><td>+20 pts</td><td>Par sirène dans les plis</td></tr>
-        <tr><td><span class="rules-badge rb-gray">Carte 14</span></td><td>+10 ou +20 pts</td><td>Saisir la valeur directement (14 noir = +20)</td></tr>
+        <tr><td><span class="rules-badge rb-gray">14 &amp; Bonus</span></td><td>-20 &agrave; +990 pts (par &plusmn;10)</td><td>Regroupe&nbsp;: carte 14 (+10), 14 noir (+20), Rascal (-20), cartes Butin, bonus extension. <strong>Toujours accessible</strong>, ind&eacute;pendamment du pari et des plis.</td></tr>
       </table>
     </div>
 
@@ -400,7 +446,7 @@ th{background:#1e0b05;color:gold;}
       <h3>Extension Tempêtes et Canailles</h3>
       <table class="rules-table">
         <tr><th>Élément</th><th>Effet</th></tr>
-        <tr><td><span class="rules-badge rb-blue">Bonus extension</span></td><td>Valeur libre ±10 pts, ajoutée quelle que soit l'issue du pari</td></tr>
+        <tr><td><span class="rules-badge rb-blue">Bonus extension</span></td><td>Int&eacute;gr&eacute; dans la case <strong>14 &amp; Bonus</strong></td></tr>
         <tr><td><span class="rules-badge rb-amber">Manches 6→10</span></td><td>Activation du fond orageux et bannière Tempêtes</td></tr>
       </table>
     </div>
@@ -646,7 +692,7 @@ function cardHTML(pi,i,prefix,rnd){
       makeField('Pirates',prefix+'pirate'+i,-1,1,0,99)+
       makeField('Sirènes',prefix+'mermaid'+i,-1,1,0,99)+
       makeField('Skull King',prefix+'skull'+i,-1,1,0,99)+
-      makeField('Carte 14',prefix+'fourteen'+i,-10,10,0,990)+
+      makeField('14 &amp; Bonus',prefix+'fourteen'+i,-10,10,-20,990)+
       extRow+
     '</div>'+
     '<div class="score-preview"><span class="lbl">Score estimé : </span><span id="'+prefix+'previewVal'+i+'" class="val val-zero">0</span></div>'+
@@ -725,10 +771,12 @@ var editRound=1;
 function updateBonusState(i,pfx){
   pfx=pfx||'';
   var made=getVal(pfx+'made'+i);
-  ['pirate','mermaid','skull','fourteen'].forEach(function(f){
+  var bet=getVal(pfx+'bet'+i);
+  var blocked=(made<1||bet<1);
+  ['pirate','mermaid','skull'].forEach(function(f){
     var el=document.getElementById(pfx+f+i);if(!el)return;
     var row=el.closest('.field-row');if(!row)return;
-    if(made===0){el.textContent='0';row.classList.add('bonus-disabled');}
+    if(blocked){el.textContent='0';row.classList.add('bonus-disabled');}
     else row.classList.remove('bonus-disabled');
   });
 }
@@ -994,6 +1042,178 @@ function buildStats(){
   document.getElementById('statsContainer').innerHTML=html;
 }
 
+/* ── Trophies ── */
+function buildTrophies(){
+  var trophies=[];
+  /* Parieur fou: most failed bets */
+  var maxFailed=0,parieurFou=null;
+  players.forEach(function(p){
+    var failed=(p.betHistory||[]).filter(function(b){return b.bet!==b.made;}).length;
+    if(failed>maxFailed){maxFailed=failed;parieurFou=p;}
+  });
+  if(parieurFou&&maxFailed>0) trophies.push({icon:'&#129303;',name:'Parieur Fou',desc:parieurFou.emoji+' '+parieurFou.name+' — '+maxFailed+' paris ratés'});
+
+  /* Fantôme: no special cards ever */
+  players.forEach(function(p){
+    var totalCards=(p.betHistory||[]).reduce(function(a,b){return a+(b.cards||0);},0);
+    if((p.skCount||0)===0&&totalCards===0){
+      trophies.push({icon:'&#128123;',name:'Fantôme des Mers',desc:p.emoji+' '+p.name+' — aucune carte spéciale capturée'});
+    }
+  });
+
+  /* Capitaine Barbe-dOr: best success rate */
+  var bestRate=-1,capitaine=null;
+  players.forEach(function(p){
+    var bh=p.betHistory||[];
+    if(!bh.length)return;
+    var rate=bh.filter(function(b){return b.bet===b.made;}).length/bh.length;
+    if(rate>bestRate){bestRate=rate;capitaine=p;}
+  });
+  if(capitaine) trophies.push({icon:'&#129351;',name:'Capitaine Barbe-d’Or',desc:capitaine.emoji+' '+capitaine.name+' — '+Math.round(bestRate*100)+'% de réussite'});
+
+  /* Skull King Hunter: most SK captured */
+  var maxSK=0,hunter=null;
+  players.forEach(function(p){if((p.skCount||0)>maxSK){maxSK=p.skCount;hunter=p;}});
+  if(hunter&&maxSK>0) trophies.push({icon:'&#128128;',name:'Chasseur de Skull King',desc:hunter.emoji+' '+hunter.name+' — '+maxSK+' SK capturés'});
+
+  /* Série dorée: best streak */
+  var maxStrk=0,streaker=null;
+  players.forEach(function(p){
+    var bh=p.betHistory||[],cur=0,best=0;
+    bh.forEach(function(b){if(b.bet===b.made)cur++;else cur=0;if(cur>best)best=cur;});
+    if(best>maxStrk){maxStrk=best;streaker=p;}
+  });
+  if(streaker&&maxStrk>=3) trophies.push({icon:'&#128293;',name:'Série Dorée',desc:streaker.emoji+' '+streaker.name+' — série de '+maxStrk+' paris réussis'});
+
+  if(!trophies.length)return;
+  var sec=document.getElementById('trophiesSection');
+  sec.style.display='block';
+  document.getElementById('trophiesList').innerHTML=trophies.map(function(t){
+    return '<div class="trophy-row"><span class="trophy-icon">'+t.icon+'</span><div><div class="trophy-name">'+t.name+'</div><div class="trophy-desc">'+t.desc+'</div></div></div>';
+  }).join('');
+}
+
+/* ── Progress chart ── */
+function buildProgressChart(){
+  var sec=document.getElementById('chartSection');
+  sec.style.display='block';
+  var canvas=document.getElementById('progressChart');
+  var ctx=canvas.getContext('2d');
+  var W=canvas.offsetWidth||500;
+  var H=220;
+  canvas.width=W*window.devicePixelRatio;
+  canvas.height=H*window.devicePixelRatio;
+  ctx.scale(window.devicePixelRatio,window.devicePixelRatio);
+
+  /* Build score timeline from gameHistory */
+  var rounds=gameHistory.length;
+  if(!rounds)return;
+  var timelines={};
+  players.forEach(function(p){timelines[p.name]=[];});
+  var running={};
+  players.forEach(function(p){running[p.name]=0;});
+  gameHistory.forEach(function(h){
+    h.players.forEach(function(snap){
+      /* find delta vs previous */
+    });
+    /* use snap totals directly */
+    players.forEach(function(p,pi){
+      var snap=h.players[pi];
+      timelines[p.name].push(snap?snap.total:0);
+    });
+  });
+  /* Also add final state */
+  players.forEach(function(p){
+    var last=timelines[p.name][timelines[p.name].length-1];
+    if(last!==p.total)timelines[p.name].push(p.total);
+  });
+
+  var allVals=[0];
+  players.forEach(function(p){allVals=allVals.concat(timelines[p.name]);});
+  var minV=Math.min.apply(null,allVals);
+  var maxV=Math.max.apply(null,allVals);
+  if(maxV===minV){maxV=minV+10;}
+
+  var padL=36,padR=10,padT=14,padB=24;
+  var chartW=W-padL-padR;
+  var chartH=H-padT-padB;
+  var cols=COLORS;
+
+  /* Grid */
+  ctx.strokeStyle='rgba(90,48,16,0.35)';ctx.lineWidth=0.5;
+  for(var g=0;g<=4;g++){
+    var gy=padT+chartH*(1-g/4);
+    ctx.beginPath();ctx.moveTo(padL,gy);ctx.lineTo(padL+chartW,gy);ctx.stroke();
+    var lbl=Math.round(minV+(maxV-minV)*g/4);
+    ctx.fillStyle='rgba(200,160,80,0.7)';ctx.font='10px Roboto,sans-serif';ctx.textAlign='right';
+    ctx.fillText(lbl,padL-3,gy+3);
+  }
+
+  /* Lines */
+  var pts=timelines[players[0].name].length;
+  players.forEach(function(p,pi){
+    var data=timelines[p.name];
+    if(!data.length)return;
+    ctx.beginPath();ctx.strokeStyle=p.color;ctx.lineWidth=2;ctx.lineJoin='round';
+    data.forEach(function(v,i){
+      var x=padL+chartW*(i/(Math.max(pts-1,1)));
+      var y=padT+chartH*(1-(v-minV)/(maxV-minV));
+      if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+    });
+    ctx.stroke();
+    /* Dots */
+    data.forEach(function(v,i){
+      var x=padL+chartW*(i/(Math.max(pts-1,1)));
+      var y=padT+chartH*(1-(v-minV)/(maxV-minV));
+      ctx.beginPath();ctx.arc(x,y,3,0,Math.PI*2);
+      ctx.fillStyle=p.color;ctx.fill();
+    });
+    /* Legend */
+    ctx.fillStyle=p.color;ctx.font='11px Roboto,sans-serif';ctx.textAlign='left';
+    var lastX=padL+chartW;
+    var lastY=padT+chartH*(1-(data[data.length-1]-minV)/(maxV-minV));
+    ctx.fillText(p.emoji+' '+p.name,Math.max(padL,lastX-60),Math.min(H-padB,Math.max(padT+10,lastY)));
+  });
+
+  /* X axis labels */
+  ctx.fillStyle='rgba(200,160,80,0.6)';ctx.font='10px Roboto,sans-serif';ctx.textAlign='center';
+  for(var m=0;m<pts;m++){
+    var x=padL+chartW*(m/(Math.max(pts-1,1)));
+    ctx.fillText('M'+(m+1),x,H-padB+14);
+  }
+}
+
+/* ── Comparison ── */
+function buildComparison(){
+  var all=JSON.parse(localStorage.getItem('skullkingGames')||'[]');
+  if(all.length<2)return;
+  var currentNames=players.map(function(p){return p.name;}).sort().join(',');
+  var prev=null;
+  for(var i=1;i<all.length;i++){
+    var names=all[i].results.map(function(r){return r.name;}).sort().join(',');
+    if(names===currentNames){prev=all[i];break;}
+  }
+  if(!prev)return;
+  var sec=document.getElementById('compareSection');
+  sec.style.display='block';
+  var current=all[0];
+  var rows=current.results.map(function(r){
+    var prevR=prev.results.find(function(p){return p.name===r.name;});
+    if(!prevR)return '';
+    var diff=r.total-prevR.total;
+    var cls=diff>0?'compare-up':diff<0?'compare-down':'compare-same';
+    var arrow=diff>0?'&#9650;':diff<0?'&#9660;':'&#8212;';
+    var p=players.find(function(pl){return pl.name===r.name;});
+    var emoji=p?p.emoji:'';
+    return '<div class="compare-row">'+
+      '<span style="color:'+(p?p.color:'#ffcc66')+'">'+emoji+' '+r.name+'</span>'+
+      '<span>'+prevR.total+' &#8594; '+r.total+'</span>'+
+      '<span class="'+cls+'">'+arrow+' '+(diff>0?'+':'')+diff+'</span>'+
+    '</div>';
+  }).join('');
+  document.getElementById('compareList').innerHTML=rows||'<p style="color:#aaa;font-size:0.85em;">Pas de données comparables.</p>';
+}
+
 /* ── Final ── */
 function showFinal(){
   document.getElementById('gameArea').style.display='none';
@@ -1044,6 +1264,9 @@ function showFinal(){
   buildStats();
   saveGameToHistory(sorted);
   if(withTourn){sorted.forEach(function(p){if(!tournData[p.name])tournData[p.name]={total:0,games:0,emoji:p.emoji,color:p.color};tournData[p.name].total+=p.total;tournData[p.name].games+=1;});saveTourn();refreshTournDisplay();}
+  buildTrophies();
+  buildProgressChart();
+  buildComparison();
   launchCoins();
 }
 
@@ -1126,7 +1349,24 @@ document.getElementById('btnNext').onclick=function(){goToCard('carouselTrack','
 document.getElementById('btnToggleUndo').onclick=function(){var d=document.getElementById('undoHistory');d.style.display=d.style.display==='none'?'block':'none';};
 
 document.getElementById('playerName').onkeydown=function(e){if(e.key==='Enter')addPlayer();};
+function toggleCustomRounds(sel){
+  var inp=document.getElementById('customRounds');
+  if(inp)inp.style.display=sel.value==='custom'?'inline-block':'none';
+}
 document.getElementById('selRounds').onchange=function(){toggleCustomRounds(this);};
+/* Font slider */
+(function(){
+  var slider=document.getElementById('fontSlider');
+  var val=document.getElementById('fontSliderVal');
+  function applyFont(size){
+    document.body.style.fontSize=size+'px';
+    val.textContent=size+'px';
+    localStorage.setItem('skFontSize',size);
+  }
+  var saved=+localStorage.getItem('skFontSize');
+  if(saved>=12&&saved<=22){slider.value=saved;applyFont(saved);}
+  slider.oninput=function(){applyFont(+this.value);};
+})();
 (function(){
   var btnO=document.getElementById('btnOpenRules');
   var btnC=document.getElementById('btnCloseRules');
